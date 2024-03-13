@@ -25,7 +25,6 @@ jobs:
       run: make build-all
     - run: touch .env
     - run: bin/dataworks-helper_linux-amd64 --help
-    - run: bin/dataworks-helper_linux-amd64 --version
     - name: Install UPX
       uses: crazy-max/ghaction-upx@v3
       with:
