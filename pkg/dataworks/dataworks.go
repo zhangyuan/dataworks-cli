@@ -73,6 +73,7 @@ func ListFiles() ([]*dataworks_public20200518.ListFilesResponseBodyDataFiles, er
 
 type NormalFile struct {
 	FileId         int64
+	CommitStatus   int32
 	FolderId       string
 	Content        string
 	FileName       string
@@ -97,6 +98,7 @@ func GetScriptsWithContent() ([]NormalFile, error) {
 	files := lop.Map(normalFiles, func(x *dataworks_public20200518.ListFilesResponseBodyDataFiles, _ int) NormalFile {
 		return NormalFile{
 			FileId:         *x.FileId,
+			CommitStatus:   *x.CommitStatus,
 			FolderId:       *x.FileFolderId,
 			ConnectionName: *x.ConnectionName,
 			FileName:       *x.FileName,
