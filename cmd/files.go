@@ -77,7 +77,9 @@ var fetchFilesCmd = &cobra.Command{
 		}
 
 		lo.ForEach(files, func(file dataworks.NormalFile, _ int) {
-			dataworks.DownloadFile(file, filesOutputDirectoryPath)
+			if err := dataworks.DownloadFile(file, filesOutputDirectoryPath); err != nil {
+				log.Fatalln(err)
+			}
 		})
 	},
 }
@@ -92,15 +94,15 @@ func init() {
 
 	filesCmd.AddCommand(listAllFilesCmd)
 	listAllFilesCmd.Flags().StringVarP(&listOutputPath, "out", "o", "", "puth to file list output")
-	listAllFilesCmd.MarkFlagRequired("out")
+	_ = listAllFilesCmd.MarkFlagRequired("out")
 
 	filesCmd.AddCommand(listFilesCmd)
 	listFilesCmd.Flags().StringVarP(&listOutputPath, "out", "o", "", "puth to file list output")
-	listFilesCmd.MarkFlagRequired("out")
+	_ = listFilesCmd.MarkFlagRequired("out")
 
 	filesCmd.AddCommand(fetchFilesCmd)
 	fetchFilesCmd.Flags().StringVarP(&filesListFilePath, "input", "i", "", "path to file list")
 	fetchFilesCmd.Flags().StringVarP(&filesOutputDirectoryPath, "out", "o", "", "path to files directory")
-	fetchFilesCmd.MarkFlagRequired("input")
-	fetchFilesCmd.MarkFlagRequired("output")
+	_ = fetchFilesCmd.MarkFlagRequired("input")
+	_ = fetchFilesCmd.MarkFlagRequired("output")
 }
