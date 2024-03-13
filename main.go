@@ -1,10 +1,7 @@
-/*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-*/
 package main
 
 import (
-	"aliyun-dataworks/cmd"
+	"dataworks-helper/cmd"
 	"log"
 
 	"github.com/joho/godotenv"
