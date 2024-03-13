@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"aliyun-dataworks/pkg/dataworks"
+	"dataworks-helper/pkg/dataworks"
 	"encoding/json"
 	"log"
 	"os"
