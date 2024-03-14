@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"time"
 
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
@@ -80,6 +81,7 @@ var fetchFilesCmd = &cobra.Command{
 			if err := dataworks.DownloadFile(file, filesOutputDirectoryPath); err != nil {
 				log.Fatalln(err)
 			}
+			time.Sleep(500 * time.Millisecond)
 		})
 	},
 }
