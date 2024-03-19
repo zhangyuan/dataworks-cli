@@ -12,7 +12,10 @@ build-macos:
 build-linux:
 	GOOS=linux GOARCH=amd64 go build -o bin/dataworks-helper_linux-amd64
 
-build-all: clean build-macos build-linux
+build-windows:
+    GOOS=windows GOARCH=amd64 go build -o bin/dataworks-helper_windows-amd64
+
+build-all: clean build-macos build-linux build-windows
 
 compress-linux:
 	upx ./bin/dataworks-helper_linux*
