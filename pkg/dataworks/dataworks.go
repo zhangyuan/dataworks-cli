@@ -171,3 +171,116 @@ func GetFileExt(fileType int32) string {
 	}
 	return ""
 }
+
+type Table struct {
+	Name    string
+	Guid    string
+	Columns []TableColumn
+}
+
+type TableColumn struct {
+	Caption           *string
+	Name              string
+	Guid              string
+	Comment           string
+	IsPartitionColumn bool
+	IsPrimaryKey      *bool
+	Position          int32
+}
+
+func ListTables(client *dataworks_public20200518.Client, appGuid string) ([]Table, error) {
+	var pageNumber int32 = 1
+	var pageSize int32 = 100
+
+	dataSourceType := "odps"
+
+	var tables []Table
+
+	for {
+		request := dataworks_public20200518.GetMetaDBTableListRequest{
+			AppGuid:        &appGuid,
+			PageNumber:     &pageNumber,
+			PageSize:       &pageSize,
+			DataSourceType: &dataSourceType,
+		}
+
+		res, err := client.GetMetaDBTableList(&request)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, tableEntity := range res.Body.Data.TableEntityList {
+			tables = append(tables, Table{
+				Name: *tableEntity.TableName,
+				Guid: *tableEntity.TableGuid,
+			})
+		}
+
+		if int64(pageNumber*pageSize) >= *res.Body.Data.TotalCount {
+			break
+		}
+
+		pageNumber++
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	return tables, nil
+}
+
+func GetTableFullInfo(client *dataworks_public20200518.Client, table *Table) (*Table, error) {
+	dataSourceType := "odps"
+
+	getMetaTableFullInfoRequest := dataworks_public20200518.GetMetaTableFullInfoRequest{
+		DataSourceType: &dataSourceType,
+		TableGuid:      &table.Guid,
+		TableName:      &table.Name,
+	}
+
+	res, err := client.GetMetaTableFullInfo(&getMetaTableFullInfoRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	var columns []TableColumn
+
+	for _, c := range res.Body.Data.ColumnList {
+		columns = append(columns, TableColumn{
+			Caption:           c.Caption,
+			Name:              *c.ColumnName,
+			Guid:              *c.ColumnGuid,
+			Position:          *c.Position,
+			Comment:           *c.Comment,
+			IsPrimaryKey:      c.IsPrimaryKey,
+			IsPartitionColumn: *c.IsPartitionColumn,
+		})
+	}
+
+	return &Table{
+		Name:    table.Name,
+		Guid:    table.Guid,
+		Columns: columns,
+	}, nil
+}
+
+func GetTables(appGuid string) ([]Table, error) {
+	client, err := CreateClient()
+	if err != nil {
+		return nil, err
+	}
+
+	tableList, err := ListTables(client, appGuid)
+	if err != nil {
+		return nil, err
+	}
+
+	var tables []Table
+	for _, t := range tableList {
+		table, err := GetTableFullInfo(client, &t)
+		if err != nil {
+			return nil, err
+		}
+		tables = append(tables, *table)
+		time.Sleep(500 * time.Millisecond)
+	}
+	return tables, nil
+}
