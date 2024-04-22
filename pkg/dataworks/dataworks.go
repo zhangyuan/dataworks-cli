@@ -230,29 +230,42 @@ func ListTables(client *dataworks_public20200518.Client, appGuid string) ([]Tabl
 func GetTableFullInfo(client *dataworks_public20200518.Client, table *Table) (*Table, error) {
 	dataSourceType := "odps"
 
-	getMetaTableFullInfoRequest := dataworks_public20200518.GetMetaTableFullInfoRequest{
-		DataSourceType: &dataSourceType,
-		TableGuid:      &table.Guid,
-		TableName:      &table.Name,
-	}
-
-	res, err := client.GetMetaTableFullInfo(&getMetaTableFullInfoRequest)
-	if err != nil {
-		return nil, err
-	}
+	var pageNumber int32 = 1
+	var pageSize int32 = 100
 
 	var columns []TableColumn
 
-	for _, c := range res.Body.Data.ColumnList {
-		columns = append(columns, TableColumn{
-			Caption:           c.Caption,
-			Name:              *c.ColumnName,
-			Guid:              *c.ColumnGuid,
-			Position:          *c.Position,
-			Comment:           *c.Comment,
-			IsPrimaryKey:      c.IsPrimaryKey,
-			IsPartitionColumn: *c.IsPartitionColumn,
-		})
+	for {
+		getMetaTableFullInfoRequest := dataworks_public20200518.GetMetaTableFullInfoRequest{
+			DataSourceType: &dataSourceType,
+			PageNum:        &pageNumber,
+			PageSize:       &pageSize,
+			TableGuid:      &table.Guid,
+			TableName:      &table.Name,
+		}
+
+		res, err := client.GetMetaTableFullInfo(&getMetaTableFullInfoRequest)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, c := range res.Body.Data.ColumnList {
+			columns = append(columns, TableColumn{
+				Caption:           c.Caption,
+				Name:              *c.ColumnName,
+				Guid:              *c.ColumnGuid,
+				Position:          *c.Position,
+				Comment:           *c.Comment,
+				IsPrimaryKey:      c.IsPrimaryKey,
+				IsPartitionColumn: *c.IsPartitionColumn,
+			})
+		}
+
+		if int64(pageNumber*pageSize) >= *res.Body.Data.TotalColumnCount {
+			break
+		}
+
+		pageNumber++
 	}
 
 	return &Table{
