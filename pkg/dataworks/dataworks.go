@@ -72,17 +72,17 @@ func ListFiles() ([]*dataworks_public20200518.ListFilesResponseBodyDataFiles, er
 }
 
 type NormalFile struct {
-	FileId         int64
-	CommitStatus   int32
+	LastEditTime   time.Time
+	CreateTime     time.Time
 	FolderId       string
 	Content        string
 	FileName       string
-	FileType       int32
-	LastEditTime   time.Time
 	LastEditUser   string
-	CreateTime     time.Time
 	CreateUser     string
 	ConnectionName string
+	FileId         int64
+	CommitStatus   int32
+	FileType       int32
 }
 
 func GetScriptsWithContent() ([]NormalFile, error) {
@@ -180,12 +180,12 @@ type Table struct {
 
 type TableColumn struct {
 	Caption           *string
+	IsPrimaryKey      *bool
 	Name              string
 	Guid              string
 	Comment           string
-	IsPartitionColumn bool
-	IsPrimaryKey      *bool
 	Position          int32
+	IsPartitionColumn bool
 }
 
 func ListTables(client *dataworks_public20200518.Client, appGuid string) ([]Table, error) {
