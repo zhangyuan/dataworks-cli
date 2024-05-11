@@ -71,6 +71,88 @@ func ListFiles() ([]*dataworks_public20200518.ListFilesResponseBodyDataFiles, er
 	return files, nil
 }
 
+func ListDIJobs() ([]*dataworks_public20200518.ListDIJobsResponseBodyDIJobPagingDIJobs, error) {
+	client, err := CreateClient()
+	if err != nil {
+		return nil, err
+	}
+
+	projectIdString := os.Getenv("DATAWORKS_PROJECT_ID")
+	projectId, err := strconv.ParseInt(projectIdString, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	files := []*dataworks_public20200518.ListDIJobsResponseBodyDIJobPagingDIJobs{}
+	var pageNumber int32 = 1
+	var pageSize int32 = 100
+	for {
+		listFilesRequest := &dataworks_public20200518.ListDIJobsRequest{
+			ProjectId:  &projectId,
+			PageNumber: &pageNumber,
+			PageSize:   &pageSize,
+		}
+		res, err := client.ListDIJobs(listFilesRequest)
+		if err != nil {
+			return nil, err
+		}
+
+		files = append(files, res.Body.DIJobPaging.DIJobs...)
+
+		if pageNumber*pageSize >= *res.Body.DIJobPaging.TotalCount {
+			break
+		}
+
+		pageNumber += 1
+
+	}
+
+	return files, nil
+}
+
+func ListDISyncTasks(taskType string, dataSourceName string) ([]*dataworks_public20200518.ListRefDISyncTasksResponseBodyDataDISyncTasks, error) {
+	client, err := CreateClient()
+	if err != nil {
+		return nil, err
+	}
+
+	projectIdString := os.Getenv("DATAWORKS_PROJECT_ID")
+	projectId, err := strconv.ParseInt(projectIdString, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	files := []*dataworks_public20200518.ListRefDISyncTasksResponseBodyDataDISyncTasks{}
+	var pageNumber int64 = 1
+	var pageSize int64 = 100
+	var refType = "to"
+	for {
+		listFilesRequest := &dataworks_public20200518.ListRefDISyncTasksRequest{
+			ProjectId:      &projectId,
+			PageNumber:     &pageNumber,
+			PageSize:       &pageSize,
+			TaskType:       &taskType,
+			DatasourceName: &dataSourceName,
+			RefType:        &refType,
+		}
+		res, err := client.ListRefDISyncTasks(listFilesRequest)
+		if err != nil {
+			return nil, err
+		}
+
+		files = append(files, res.Body.Data.DISyncTasks...)
+
+		if len(res.Body.Data.DISyncTasks) == 0 {
+			break
+		}
+
+		pageNumber += 1
+
+	}
+
+	return files, nil
+}
+
 type NormalFile struct {
 	LastEditTime   time.Time
 	CreateTime     time.Time
@@ -139,7 +221,7 @@ func GetFileContent(file NormalFile) (string, error) {
 }
 
 func DownloadFile(file NormalFile, directory string) error {
-	targetFolder := filepath.Join(directory, fmt.Sprintf("%s.%s", file.ConnectionName, file.FolderId))
+	targetFolder := filepath.Join(directory, file.FolderId)
 	if err := os.MkdirAll(targetFolder, os.ModePerm); err != nil {
 		return err
 	}
