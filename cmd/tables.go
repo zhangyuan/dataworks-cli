@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"dataworks-helper/pkg/dataworks"
+	"dataworks-helper/pkg/services"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -12,7 +12,7 @@ var tablesCmd = &cobra.Command{
 	Use:   "tables",
 	Short: "export tables",
 	Run: func(cmd *cobra.Command, args []string) {
-		tables, err := dataworks.GetTables(appGuid)
+		tables, err := services.GetTables(appGuid)
 		if err != nil {
 			log.Fatalln(err)
 		}

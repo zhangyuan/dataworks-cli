@@ -1,9 +1,6 @@
 package dataworks
 
 import (
-	"os"
-	"strconv"
-
 	dataworks_public20200518 "github.com/alibabacloud-go/dataworks-public-20200518/v6/client"
 )
 
@@ -15,32 +12,21 @@ type DITask struct {
 	NodeId                  int64
 }
 
-func ListDISyncTasks(taskType string, dataSourceName string) ([]*dataworks_public20200518.ListRefDISyncTasksResponseBodyDataDISyncTasks, error) {
-	client, err := CreateClient()
-	if err != nil {
-		return nil, err
-	}
-
-	projectIdString := os.Getenv("DATAWORKS_PROJECT_ID")
-	projectId, err := strconv.ParseInt(projectIdString, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
+func (client *Client) ListDISyncTasks(taskType string, dataSourceName string) ([]*dataworks_public20200518.ListRefDISyncTasksResponseBodyDataDISyncTasks, error) {
 	files := []*dataworks_public20200518.ListRefDISyncTasksResponseBodyDataDISyncTasks{}
 	var pageNumber int64 = 1
 	var pageSize int64 = 100
 	var refType = "to"
 	for {
 		listFilesRequest := &dataworks_public20200518.ListRefDISyncTasksRequest{
-			ProjectId:      &projectId,
+			ProjectId:      &client.ProjectId,
 			PageNumber:     &pageNumber,
 			PageSize:       &pageSize,
 			TaskType:       &taskType,
 			DatasourceName: &dataSourceName,
 			RefType:        &refType,
 		}
-		res, err := client.ListRefDISyncTasks(listFilesRequest)
+		res, err := client.dwClient.ListRefDISyncTasks(listFilesRequest)
 		if err != nil {
 			return nil, err
 		}

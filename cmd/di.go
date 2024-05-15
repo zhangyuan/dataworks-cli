@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"dataworks-helper/pkg/dataworks"
+	"dataworks-helper/pkg/services"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -14,7 +14,7 @@ var diCmd = &cobra.Command{
 var diListCmd = &cobra.Command{
 	Use: "list-sync-tasks",
 	Run: func(cmd *cobra.Command, args []string) {
-		files, err := dataworks.ListDISyncTasks(diTaskType, diDataSourceName)
+		files, err := services.ListDISyncTasks(diTaskType, diDataSourceName)
 		if err != nil {
 			log.Fatalln(err)
 		}

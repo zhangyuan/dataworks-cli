@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"dataworks-helper/pkg/dataworks"
+	"dataworks-helper/pkg/services"
 	"encoding/json"
 	"log"
 	"os"
@@ -18,13 +19,13 @@ var filesCmd = &cobra.Command{
 var listFilesCmd = &cobra.Command{
 	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
-		files, err := dataworks.ListFilesNormalized(fileTypes)
+		files, err := services.ListFilesNormalized(fileTypes)
 
 		if err != nil {
 			log.Fatalln(err)
 		}
 
-		if err := WriteJSON(filesOutputDirectoryPath, files); err != nil {
+		if err := WriteJSON(listOutputPath, files); err != nil {
 			log.Fatalln(err)
 		}
 	},
@@ -43,7 +44,7 @@ var filesDownloadCmd = &cobra.Command{
 		}
 
 		lo.ForEach(files, func(file dataworks.NormalFile, _ int) {
-			if err := dataworks.DownloadFile(file, filesOutputDirectoryPath); err != nil {
+			if err := services.DownloadFile(file, filesOutputDirectoryPath); err != nil {
 				log.Fatalln(err)
 			}
 			time.Sleep(500 * time.Millisecond)
