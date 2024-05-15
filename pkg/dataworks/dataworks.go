@@ -9,9 +9,6 @@ import (
 
 	openapi "github.com/alibabacloud-go/darabonba-openapi/v2/client"
 	dataworks_public20200518 "github.com/alibabacloud-go/dataworks-public-20200518/v6/client"
-
-	"github.com/samber/lo"
-	lop "github.com/samber/lo/parallel"
 )
 
 const (
@@ -32,14 +29,23 @@ func CreateClient() (_result *dataworks_public20200518.Client, _err error) {
 	return dataworks_public20200518.NewClient(config)
 }
 
-func ListFiles() ([]*dataworks_public20200518.ListFilesResponseBodyDataFiles, error) {
+func GetProjectId() (int64, error) {
+	projectIdString := os.Getenv("DATAWORKS_PROJECT_ID")
+	projectId, err := strconv.ParseInt(projectIdString, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return projectId, nil
+}
+
+func ListFiles(fileTypes string) ([]*dataworks_public20200518.ListFilesResponseBodyDataFiles, error) {
 	client, err := CreateClient()
 	if err != nil {
 		return nil, err
 	}
 
-	projectIdString := os.Getenv("DATAWORKS_PROJECT_ID")
-	projectId, err := strconv.ParseInt(projectIdString, 10, 64)
+	projectId, err := GetProjectId()
 	if err != nil {
 		return nil, err
 	}
@@ -53,6 +59,10 @@ func ListFiles() ([]*dataworks_public20200518.ListFilesResponseBodyDataFiles, er
 			PageNumber: &pageNumber,
 			PageSize:   &pageSize,
 		}
+		if fileTypes != "" {
+			listFilesRequest.FileTypes = &fileTypes
+		}
+
 		res, err := client.ListFiles(listFilesRequest)
 		if err != nil {
 			return nil, err
@@ -110,49 +120,6 @@ func ListDIJobs() ([]*dataworks_public20200518.ListDIJobsResponseBodyDIJobPaging
 	return files, nil
 }
 
-func ListDISyncTasks(taskType string, dataSourceName string) ([]*dataworks_public20200518.ListRefDISyncTasksResponseBodyDataDISyncTasks, error) {
-	client, err := CreateClient()
-	if err != nil {
-		return nil, err
-	}
-
-	projectIdString := os.Getenv("DATAWORKS_PROJECT_ID")
-	projectId, err := strconv.ParseInt(projectIdString, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	files := []*dataworks_public20200518.ListRefDISyncTasksResponseBodyDataDISyncTasks{}
-	var pageNumber int64 = 1
-	var pageSize int64 = 100
-	var refType = "to"
-	for {
-		listFilesRequest := &dataworks_public20200518.ListRefDISyncTasksRequest{
-			ProjectId:      &projectId,
-			PageNumber:     &pageNumber,
-			PageSize:       &pageSize,
-			TaskType:       &taskType,
-			DatasourceName: &dataSourceName,
-			RefType:        &refType,
-		}
-		res, err := client.ListRefDISyncTasks(listFilesRequest)
-		if err != nil {
-			return nil, err
-		}
-
-		files = append(files, res.Body.Data.DISyncTasks...)
-
-		if len(res.Body.Data.DISyncTasks) == 0 {
-			break
-		}
-
-		pageNumber += 1
-
-	}
-
-	return files, nil
-}
-
 type NormalFile struct {
 	LastEditTime   time.Time
 	CreateTime     time.Time
@@ -162,36 +129,110 @@ type NormalFile struct {
 	LastEditUser   string
 	CreateUser     string
 	ConnectionName string
+	FolderPath     string
 	FileId         int64
 	CommitStatus   int32
 	FileType       int32
 }
 
-func GetScriptsWithContent() ([]NormalFile, error) {
-	allFiles, err := ListFiles()
+type Folder struct {
+	FolderId   string
+	FolderPath string
+}
+
+func uniqueString(s []string) []string {
+	inResult := make(map[string]bool)
+	var result []string
+	for _, str := range s {
+		if _, ok := inResult[str]; !ok {
+			inResult[str] = true
+			result = append(result, str)
+		}
+	}
+	return result
+}
+
+func GetFolders(projectId int64, folderIds []string) ([]Folder, error) {
+	folderIds = uniqueString(folderIds)
+
+	client, err := CreateClient()
 	if err != nil {
 		return nil, err
 	}
 
-	normalFiles := lo.Filter(allFiles, func(item *dataworks_public20200518.ListFilesResponseBodyDataFiles, index int) bool {
-		return *item.UseType == NOMARL_USE_TYPE && !lo.Contains([]int{23, 99, 1119}, int(*item.FileType))
-	})
+	var folders []Folder
 
-	files := lop.Map(normalFiles, func(x *dataworks_public20200518.ListFilesResponseBodyDataFiles, _ int) NormalFile {
-		return NormalFile{
-			FileId:         *x.FileId,
-			CommitStatus:   *x.CommitStatus,
-			FolderId:       *x.FileFolderId,
-			ConnectionName: *x.ConnectionName,
-			FileName:       *x.FileName,
-			FileType:       *x.FileType,
-			LastEditTime:   time.UnixMilli(*x.LastEditTime),
-			LastEditUser:   *x.LastEditUser,
-			CreateUser:     *x.CreateUser,
-			CreateTime:     time.UnixMilli(*x.CreateTime),
-			Content:        *x.Content,
+	for _, folderId := range folderIds {
+		request := dataworks_public20200518.GetFolderRequest{
+			ProjectId: &projectId,
+			FolderId:  &folderId,
 		}
-	})
+
+		response, err := client.GetFolder(&request)
+		if err != nil {
+			return nil, err
+		}
+
+		folders = append(folders, Folder{
+			FolderId:   *response.Body.Data.FolderId,
+			FolderPath: *response.Body.Data.FolderPath,
+		})
+
+		time.Sleep(1 * time.Second)
+	}
+
+	return folders, nil
+}
+
+func ListFilesNormalized(fileTypes string) ([]NormalFile, error) {
+	rawFiles, err := ListFiles(fileTypes)
+	if err != nil {
+		return nil, err
+	}
+
+	var folderIds []string
+	for idx := range rawFiles {
+		folderIds = append(folderIds, *rawFiles[idx].FileFolderId)
+	}
+
+	projectId, err := GetProjectId()
+	if err != nil {
+		return nil, err
+	}
+
+	folders, err := GetFolders(projectId, folderIds)
+	if err != nil {
+		return nil, err
+	}
+
+	var files []NormalFile
+
+	for idx := range rawFiles {
+		rawFile := rawFiles[idx]
+		normalFile := NormalFile{
+			FileId:         *rawFile.FileId,
+			CommitStatus:   *rawFile.CommitStatus,
+			FolderId:       *rawFile.FileFolderId,
+			ConnectionName: *rawFile.ConnectionName,
+			FileName:       *rawFile.FileName,
+			FileType:       *rawFile.FileType,
+			LastEditTime:   time.UnixMilli(*rawFile.LastEditTime),
+			LastEditUser:   *rawFile.LastEditUser,
+			CreateUser:     *rawFile.CreateUser,
+			CreateTime:     time.UnixMilli(*rawFile.CreateTime),
+			Content:        *rawFile.Content,
+		}
+
+		for folderIdx := range folders {
+			folder := folders[folderIdx]
+			if folder.FolderId == *rawFile.FileFolderId {
+				normalFile.FolderPath = folder.FolderPath
+			}
+		}
+
+		files = append(files, normalFile)
+	}
+
 	return files, nil
 }
 
@@ -221,7 +262,12 @@ func GetFileContent(file NormalFile) (string, error) {
 }
 
 func DownloadFile(file NormalFile, directory string) error {
-	targetFolder := filepath.Join(directory, file.FolderId)
+	folderPath := file.FolderPath
+	if folderPath == "" {
+		folderPath = file.FolderId
+	}
+	targetFolder := filepath.Join(directory, folderPath)
+
 	if err := os.MkdirAll(targetFolder, os.ModePerm); err != nil {
 		return err
 	}
@@ -250,6 +296,10 @@ func GetFileExt(fileType int32) string {
 	// ODPS SQL
 	if fileType == 10 {
 		return "sql"
+	}
+	// 数据集成
+	if fileType == 23 {
+		return "json"
 	}
 	return ""
 }
