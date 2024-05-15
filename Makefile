@@ -13,7 +13,7 @@ build-linux:
 	GOOS=linux GOARCH=amd64 go build -o bin/dataworks-helper_linux-amd64
 
 build-windows:
-    GOOS=windows GOARCH=amd64 go build -o bin/dataworks-helper_windows-amd64
+	GOOS=windows GOARCH=amd64 go build -o bin/dataworks-helper_windows-amd64
 
 build-all: clean build-macos build-linux build-windows
 
