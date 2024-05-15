@@ -17,20 +17,21 @@ DATAWORKS_PROJECT_ID=
 DATAWORKS_ENDPOINT=dataworks.cn-beijing.aliyuncs.com # or other endpoint
 ```
 
-### Get the file list for SQL scripts only
+### Get the file list by file types
 
 ```bash
-dataworks-helper files list -o files.json
+dataworks-helper files list -t 10,23  -o files/manifest.json
 ```
 
-### Get the file list of all files
-
-```bash
-dataworks-helper files list-all  -o all.json
-```
 
 ### Download the files from the file list
 
 ```bash
-files download -i files.json -o ./code
+dataworks-helper files list -t 10,23  -o files/manifest.json
 ```
+
+### Get the table list by data source
+
+```bash
+dataworks-helper tables -a odps.xxxx -o databases/dev/tables.json
+````
