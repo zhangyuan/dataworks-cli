@@ -12,7 +12,7 @@ var diCmd = &cobra.Command{
 }
 
 var diListCmd = &cobra.Command{
-	Use: "list",
+	Use: "list-sync-tasks",
 	Run: func(cmd *cobra.Command, args []string) {
 		files, err := dataworks.ListDISyncTasks(diTaskType, diDataSourceName)
 		if err != nil {
@@ -34,7 +34,7 @@ func init() {
 	rootCmd.AddCommand(diCmd)
 	diCmd.AddCommand(diListCmd)
 
-	diListCmd.Flags().StringVarP(&diTasksOutputPath, "out", "o", "", "puth to output")
+	diListCmd.Flags().StringVarP(&diTasksOutputPath, "out", "o", "", "path to output")
 	_ = diListCmd.MarkFlagRequired("out")
 	diListCmd.Flags().StringVarP(&diTaskType, "task-type", "t", "DI_OFFLINE", "DI task type")
 	diListCmd.Flags().StringVarP(&diDataSourceName, "data-source-name", "s", "", "DI task data source name")

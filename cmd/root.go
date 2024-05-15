@@ -14,7 +14,7 @@ var rootCmd = &cobra.Command{
 }
 
 func WriteJSON(outputPath string, data interface{}) error {
-	file, err := os.Create(listOutputPath)
+	file, err := os.Create(outputPath)
 	if err != nil {
 		log.Fatal(err)
 	}

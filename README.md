@@ -33,5 +33,11 @@ dataworks-helper files list -t 10,23  -o files/manifest.json
 ### Get the table list by data source
 
 ```bash
-dataworks-helper tables -a odps.xxxx -o databases/dev/tables.json
-````
+dataworks-helper files download -i files.json -o ./files
+```
+
+### Get the DI sync tasks
+
+```bash
+dataworks-helper di list-sync-tasks -s data-source-name -o di-sync-tasks.json
+```
