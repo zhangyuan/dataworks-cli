@@ -41,3 +41,9 @@ dataworks-helper files download -i files.json -o ./files
 ```bash
 dataworks-helper di list-sync-tasks -s data-source-name -o di-sync-tasks.json
 ```
+
+### Get the node list by project env
+
+```bash
+dataworks-helper nodes list -e PROD -o nodes.json
+```
