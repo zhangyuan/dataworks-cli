@@ -25,7 +25,7 @@ var listFilesCmd = &cobra.Command{
 			log.Fatalln(err)
 		}
 
-		if err := WriteJSON(listOutputPath, files); err != nil {
+		if err := WriteJSON(filesListOutputPath, files); err != nil {
 			log.Fatalln(err)
 		}
 	},
@@ -52,7 +52,7 @@ var filesDownloadCmd = &cobra.Command{
 	},
 }
 
-var listOutputPath string
+var filesListOutputPath string
 
 var filesListFilePath string
 var filesOutputDirectoryPath string
@@ -62,7 +62,7 @@ func init() {
 	rootCmd.AddCommand(filesCmd)
 
 	filesCmd.AddCommand(listFilesCmd)
-	listFilesCmd.Flags().StringVarP(&listOutputPath, "out", "o", "", "puth to file list output")
+	listFilesCmd.Flags().StringVarP(&filesListOutputPath, "out", "o", "", "puth to file list output")
 	listFilesCmd.Flags().StringVarP(&fileTypes, "file-types", "t", "10", "file types")
 	_ = listFilesCmd.MarkFlagRequired("out")
 

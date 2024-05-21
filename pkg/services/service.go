@@ -106,3 +106,12 @@ func GetTables(appGuid string) ([]dataworks.Table, error) {
 
 	return client.GetTables(appGuid)
 }
+
+func ListNodes(productEnv string) ([]*dataworks_public20200518.ListNodesResponseBodyDataNodes, error) {
+	client, err := CreateClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return client.ListNodes(productEnv)
+}
