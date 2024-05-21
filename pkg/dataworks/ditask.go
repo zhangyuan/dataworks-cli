@@ -26,6 +26,7 @@ func (client *Client) ListDISyncTasks(taskType string, dataSourceName string) ([
 			DatasourceName: &dataSourceName,
 			RefType:        &refType,
 		}
+
 		res, err := client.dwClient.ListRefDISyncTasks(listFilesRequest)
 		if err != nil {
 			return nil, err
