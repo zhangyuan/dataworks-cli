@@ -18,18 +18,18 @@ type Client struct {
 type NormalFile struct {
 	LastEditTime   time.Time
 	CreateTime     time.Time
-	FileFolderId   string
-	Content        string
+	NodeId         *int64
+	CreateUser     string
 	FileName       string
 	LastEditUser   string
-	CreateUser     string
+	Content        string
 	ConnectionName string
 	FolderPath     string
+	FileFolderId   string
 	FileId         int64
-	NodeId         *int64
+	BusinessId     int64
 	CommitStatus   int32
 	FileType       int32
-	BusinessId     int64
 }
 
 type Folder struct {
