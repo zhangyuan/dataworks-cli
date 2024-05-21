@@ -18,7 +18,7 @@ type Client struct {
 type NormalFile struct {
 	LastEditTime   time.Time
 	CreateTime     time.Time
-	FolderId       string
+	FileFolderId   string
 	Content        string
 	FileName       string
 	LastEditUser   string
@@ -26,8 +26,10 @@ type NormalFile struct {
 	ConnectionName string
 	FolderPath     string
 	FileId         int64
+	NodeId         *int64
 	CommitStatus   int32
 	FileType       int32
+	BusinessId     int64
 }
 
 type Folder struct {
@@ -174,7 +176,7 @@ func (client *Client) ListFilesNormalized(fileTypes string) ([]NormalFile, error
 		normalFile := NormalFile{
 			FileId:         *rawFile.FileId,
 			CommitStatus:   *rawFile.CommitStatus,
-			FolderId:       *rawFile.FileFolderId,
+			FileFolderId:   *rawFile.FileFolderId,
 			ConnectionName: *rawFile.ConnectionName,
 			FileName:       *rawFile.FileName,
 			FileType:       *rawFile.FileType,
@@ -183,6 +185,8 @@ func (client *Client) ListFilesNormalized(fileTypes string) ([]NormalFile, error
 			CreateUser:     *rawFile.CreateUser,
 			CreateTime:     time.UnixMilli(*rawFile.CreateTime),
 			Content:        *rawFile.Content,
+			NodeId:         rawFile.NodeId,
+			BusinessId:     *rawFile.BusinessId,
 		}
 
 		for folderIdx := range folders {
@@ -215,7 +219,7 @@ func (client *Client) GetFileContent(file NormalFile) (string, error) {
 func (client *Client) DownloadFile(file NormalFile, directory string) error {
 	folderPath := file.FolderPath
 	if folderPath == "" {
-		folderPath = file.FolderId
+		folderPath = file.FileFolderId
 	}
 	targetFolder := filepath.Join(directory, folderPath)
 
