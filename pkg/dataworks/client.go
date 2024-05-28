@@ -88,7 +88,7 @@ func (client *Client) ListFiles(fileTypes string) ([]*dataworks_public20200518.L
 
 		files = append(files, res.Body.Data.Files...)
 
-		if pageNumber*pageSize >= *res.Body.Data.TotalCount {
+		if pageNumber**res.Body.Data.PageSize >= *res.Body.Data.TotalCount {
 			break
 		}
 
@@ -116,7 +116,7 @@ func (client *Client) ListDIJobs() ([]*dataworks_public20200518.ListDIJobsRespon
 
 		files = append(files, res.Body.DIJobPaging.DIJobs...)
 
-		if pageNumber*pageSize >= *res.Body.DIJobPaging.TotalCount {
+		if pageNumber**res.Body.DIJobPaging.PageSize >= *res.Body.DIJobPaging.TotalCount {
 			break
 		}
 
