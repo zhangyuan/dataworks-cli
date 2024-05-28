@@ -5,7 +5,6 @@ go 1.21.1
 require (
 	github.com/alibabacloud-go/darabonba-openapi/v2 v2.0.5
 	github.com/alibabacloud-go/dataworks-public-20200518/v6 v6.1.0
-	github.com/go-resty/resty/v2 v2.11.0
 	github.com/joho/godotenv v1.5.1
 	github.com/samber/lo v1.39.0
 	github.com/spf13/cobra v1.8.0
