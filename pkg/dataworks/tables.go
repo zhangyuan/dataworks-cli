@@ -50,7 +50,7 @@ func (client *Client) ListTables(appGuid string) ([]Table, error) {
 			})
 		}
 
-		if int64(pageNumber*pageSize) >= *res.Body.Data.TotalCount {
+		if int64(pageNumber**res.Body.Data.PageSize) >= *res.Body.Data.TotalCount {
 			break
 		}
 
