@@ -4,6 +4,7 @@ import (
 	"dataworks-helper/pkg/dataworks"
 	"os"
 	"strconv"
+	"time"
 
 	dataworks_public20200518 "github.com/alibabacloud-go/dataworks-public-20200518/v6/client"
 )
@@ -16,13 +17,23 @@ func CreateClient() (*dataworks.Client, error) {
 	accessKeyId := os.Getenv("ACCESS_KEY_ID")
 	accessKeySecret := os.Getenv("ACCESS_KEY_SECRET")
 	endpoint := os.Getenv("DATAWORKS_ENDPOINT")
+	throttle := os.Getenv("THROTTLE")
+
+	if throttle == "" {
+		throttle = "1s"
+	}
+
+	duration, err := time.ParseDuration(throttle)
+	if err != nil {
+		return nil, err
+	}
 
 	projectId, err := GetProjectId()
 	if err != nil {
 		return nil, err
 	}
 
-	return dataworks.NewClient(accessKeyId, accessKeySecret, endpoint, projectId)
+	return dataworks.NewClient(accessKeyId, accessKeySecret, endpoint, projectId, duration)
 }
 
 func GetProjectId() (int64, error) {
@@ -80,13 +91,12 @@ func GetFileContent(file dataworks.NormalFile) (string, error) {
 	return client.GetFileContent(file)
 }
 
-func DownloadFile(file dataworks.NormalFile, directory string) error {
+func DownloadFiles(files []dataworks.NormalFile, directory string) error {
 	client, err := CreateClient()
 	if err != nil {
 		return err
 	}
-
-	return client.DownloadFile(file, directory)
+	return client.DownloadFiles(files, directory)
 }
 
 func ListDISyncTasks(taskType string, dataSourceName string) ([]*dataworks_public20200518.ListRefDISyncTasksResponseBodyDataDISyncTasks, error) {

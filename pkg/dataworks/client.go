@@ -13,6 +13,7 @@ import (
 type Client struct {
 	dwClient  *dataworks_public20200518.Client
 	ProjectId int64
+	Throttle  time.Duration
 }
 
 type NormalFile struct {
@@ -49,7 +50,7 @@ func uniqueString(s []string) []string {
 	return result
 }
 
-func NewClient(accessKeyId, accessKeySecret string, endpoint string, projectId int64) (*Client, error) {
+func NewClient(accessKeyId, accessKeySecret string, endpoint string, projectId int64, duration time.Duration) (*Client, error) {
 	config := &openapi.Config{
 		AccessKeyId:     &accessKeyId,
 		AccessKeySecret: &accessKeySecret,
@@ -64,6 +65,7 @@ func NewClient(accessKeyId, accessKeySecret string, endpoint string, projectId i
 	return &Client{
 		dwClient:  dwClient,
 		ProjectId: projectId,
+		Throttle:  duration,
 	}, nil
 }
 
@@ -147,7 +149,7 @@ func (client *Client) GetFolders(projectId int64, folderIds []string) ([]Folder,
 			FolderPath: *response.Body.Data.FolderPath,
 		})
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(client.Throttle)
 	}
 
 	return folders, nil
@@ -245,4 +247,15 @@ func (client *Client) DownloadFile(file NormalFile, directory string) error {
 
 	_, err = targetFile.Write([]byte(content))
 	return err
+}
+
+func (client *Client) DownloadFiles(files []NormalFile, directory string) error {
+	for idx := range files {
+		if err := client.DownloadFile(files[idx], directory); err != nil {
+			return err
+		}
+
+		time.Sleep(client.Throttle)
+	}
+	return nil
 }
