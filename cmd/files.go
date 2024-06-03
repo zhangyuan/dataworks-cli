@@ -6,9 +6,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"time"
 
-	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 )
 
@@ -43,12 +41,9 @@ var filesDownloadCmd = &cobra.Command{
 			log.Fatalln(err)
 		}
 
-		lo.ForEach(files, func(file dataworks.NormalFile, _ int) {
-			if err := services.DownloadFile(file, filesOutputDirectoryPath); err != nil {
-				log.Fatalln(err)
-			}
-			time.Sleep(500 * time.Millisecond)
-		})
+		if err := services.DownloadFiles(files, filesOutputDirectoryPath); err != nil {
+			log.Fatalln(err)
+		}
 	},
 }
 

@@ -55,7 +55,7 @@ func (client *Client) ListTables(appGuid string) ([]Table, error) {
 		}
 
 		pageNumber++
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(client.Throttle)
 	}
 
 	return tables, nil
@@ -122,7 +122,7 @@ func (client *Client) GetTables(appGuid string) ([]Table, error) {
 			return nil, err
 		}
 		tables = append(tables, *table)
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(client.Throttle)
 	}
 	return tables, nil
 }
