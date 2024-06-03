@@ -1,6 +1,8 @@
 package dataworks
 
 import (
+	"sort"
+	"strings"
 	"time"
 
 	dataworks_public20200518 "github.com/alibabacloud-go/dataworks-public-20200518/v6/client"
@@ -124,5 +126,9 @@ func (client *Client) GetTables(appGuid string) ([]Table, error) {
 		tables = append(tables, *table)
 		time.Sleep(client.Throttle)
 	}
+
+	sort.Slice(tables, func(i, j int) bool {
+		return strings.Compare(tables[i].Guid, tables[j].Guid) > 0
+	})
 	return tables, nil
 }
