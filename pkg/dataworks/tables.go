@@ -3,7 +3,6 @@ package dataworks
 import (
 	"sort"
 	"strings"
-	"time"
 
 	dataworks_public20200518 "github.com/alibabacloud-go/dataworks-public-20200518/v6/client"
 )
@@ -57,7 +56,7 @@ func (client *Client) ListTables(appGuid string) ([]Table, error) {
 		}
 
 		pageNumber++
-		time.Sleep(client.Throttle)
+		client.Wait()
 	}
 
 	return tables, nil
@@ -124,7 +123,7 @@ func (client *Client) GetTables(appGuid string) ([]Table, error) {
 			return nil, err
 		}
 		tables = append(tables, *table)
-		time.Sleep(client.Throttle)
+		client.Wait()
 	}
 
 	sort.Slice(tables, func(i, j int) bool {
