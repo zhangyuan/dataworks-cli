@@ -16,6 +16,10 @@ type Client struct {
 	Throttle  time.Duration
 }
 
+func (client *Client) Wait() {
+	time.Sleep(client.Throttle)
+}
+
 type NormalFile struct {
 	LastEditTime   time.Time
 	CreateTime     time.Time
@@ -149,7 +153,7 @@ func (client *Client) GetFolders(projectId int64, folderIds []string) ([]Folder,
 			FolderPath: *response.Body.Data.FolderPath,
 		})
 
-		time.Sleep(client.Throttle)
+		client.Wait()
 	}
 
 	return folders, nil
@@ -255,7 +259,7 @@ func (client *Client) DownloadFiles(files []NormalFile, directory string) error 
 			return err
 		}
 
-		time.Sleep(client.Throttle)
+		client.Wait()
 	}
 	return nil
 }
