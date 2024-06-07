@@ -101,6 +101,8 @@ func (client *Client) GetTableFullInfo(table *Table) (*Table, error) {
 		}
 
 		pageNumber++
+
+		client.Wait()
 	}
 
 	return &Table{

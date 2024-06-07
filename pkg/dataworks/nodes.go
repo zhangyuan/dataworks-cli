@@ -33,6 +33,7 @@ func (client *Client) ListNodes(projectEnv string) ([]*dataworks_public20200518.
 
 		pageNumber += 1
 
+		client.Wait()
 	}
 
 	sortKey := func(node dataworks_public20200518.ListNodesResponseBodyDataNodes) string {
@@ -50,7 +51,7 @@ func (client *Client) ListNodes(projectEnv string) ([]*dataworks_public20200518.
 			keys = append(keys, "a")
 		}
 
-		keys = append(keys, fmt.Sprintf("%s", *node.NodeName))
+		keys = append(keys, *node.NodeName)
 
 		key := strings.Join(keys, "/")
 		return key

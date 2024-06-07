@@ -100,6 +100,7 @@ func (client *Client) ListFiles(fileTypes string) ([]*dataworks_public20200518.L
 
 		pageNumber += 1
 
+		client.Wait()
 	}
 
 	return files, nil
@@ -127,6 +128,8 @@ func (client *Client) ListDIJobs() ([]*dataworks_public20200518.ListDIJobsRespon
 		}
 
 		pageNumber += 1
+
+		client.Wait()
 	}
 
 	return files, nil
@@ -218,6 +221,8 @@ func (client *Client) GetFileContent(file NormalFile) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	client.Wait()
 
 	return *res.Body.Data.File.Content, nil
 }

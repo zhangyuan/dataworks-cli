@@ -40,6 +40,7 @@ func (client *Client) ListDISyncTasks(taskType string, dataSourceName string) ([
 
 		pageNumber += 1
 
+		client.Wait()
 	}
 
 	return files, nil
