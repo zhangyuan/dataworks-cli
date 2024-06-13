@@ -1,7 +1,7 @@
 package main
 
 import (
-	"dataworks-helper/cmd"
+	"dataworks-cli/cmd"
 	"log"
 
 	"github.com/joho/godotenv"

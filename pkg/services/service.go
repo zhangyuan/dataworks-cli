@@ -1,7 +1,7 @@
 package services
 
 import (
-	"dataworks-helper/pkg/dataworks"
+	"dataworks-cli/pkg/dataworks"
 	"os"
 	"strconv"
 	"time"

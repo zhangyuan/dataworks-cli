@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"dataworks-helper/pkg/dataworks"
-	"dataworks-helper/pkg/services"
+	"dataworks-cli/pkg/dataworks"
+	"dataworks-cli/pkg/services"
 	"encoding/json"
 	"log"
 	"os"
