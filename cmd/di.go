@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"dataworks-helper/pkg/services"
+	"dataworks-cli/pkg/services"
 	"log"
 
 	"github.com/spf13/cobra"

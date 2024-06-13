@@ -1,7 +1,7 @@
 /tmp/
 /data/
 /.env
-/dataworks-helper
+/dataworks-cli
 /bin/
 .vscode
 .DS_Store
