@@ -6,7 +6,6 @@ require (
 	github.com/alibabacloud-go/darabonba-openapi/v2 v2.0.5
 	github.com/alibabacloud-go/dataworks-public-20200518/v6 v6.1.0
 	github.com/joho/godotenv v1.5.1
-	github.com/samber/lo v1.39.0
 	github.com/spf13/cobra v1.8.0
 )
 
@@ -32,7 +31,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/tjfoc/gmsm v1.3.2 // indirect
-	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
