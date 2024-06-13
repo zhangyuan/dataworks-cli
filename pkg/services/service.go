@@ -125,3 +125,21 @@ func ListNodes(productEnv string) ([]*dataworks_public20200518.ListNodesResponse
 
 	return client.ListNodes(productEnv)
 }
+
+func ListDataModels() ([]dataworks.DataModel, error) {
+	client, err := CreateClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return client.ListDataModels()
+}
+
+func ListDataModelColumns() ([]dataworks.RawDataModelColumn, error) {
+	client, err := CreateClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return client.ListDataModelColumns()
+}
