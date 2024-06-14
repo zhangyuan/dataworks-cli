@@ -55,8 +55,31 @@ func (client *Client) DataModelShowTables(modelType string) (interface{}, error)
 	return res.Body.ReturnValue, nil
 }
 
+func (client *Client) DataModelQuery(query string) (interface{}, error) {
+	projectId := fmt.Sprintf("%d", client.ProjectId)
+	request := dataworks_public20200518.QueryPublicModelEngineRequest{
+		ProjectId: &projectId,
+		Text:      &query,
+	}
+	res, err := client.dwClient.QueryPublicModelEngine(&request)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.Body.ReturnValue, nil
+}
+
+func (client *Client) DataModelShowTableColumns(modelType string, tableCode string) (interface{}, error) {
+	query := fmt.Sprintf("show columns from %s", tableCode)
+	res, err := client.DataModelQuery(query)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (client *Client) ListDataModelColumns() ([]RawDataModelColumn, error) {
-	returnValue, err := client.DataModelShowTables("full")
+	returnValue, err := client.DataModelQuery("full")
 	if err != nil {
 		return nil, err
 	}

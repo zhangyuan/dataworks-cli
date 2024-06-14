@@ -152,3 +152,12 @@ func ShowTables(modelType string) (interface{}, error) {
 
 	return client.DataModelShowTables(modelType)
 }
+
+func ShowTableColumns(tableType string, tableCode string) (interface{}, error) {
+	client, err := CreateClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return client.DataModelShowTableColumns(tableType, tableCode)
+}

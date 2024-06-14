@@ -37,6 +37,21 @@ var dataModelShowTablesCmd = &cobra.Command{
 	},
 }
 
+var dataModelShowTableColumnsCmd = &cobra.Command{
+	Use:   "show-table-columns",
+	Short: "Show tables",
+	Run: func(cmd *cobra.Command, args []string) {
+		models, err := services.ShowTableColumns(dataModelsModelType, dataModelsTableCode)
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
+
+		if err := WriteJSON(dataModelsOutputPath, models); err != nil {
+			log.Fatalln(err)
+		}
+	},
+}
+
 var dataModelListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List data models",
@@ -58,6 +73,7 @@ var dataModelsListCmd = &cobra.Command{
 
 var dataModelsOutputPath string
 var dataModelsModelType string
+var dataModelsTableCode string
 
 func init() {
 	rootCmd.AddCommand(dataModelsListCmd)
@@ -74,4 +90,12 @@ func init() {
 	dataModelShowTablesCmd.Flags().StringVarP(&dataModelsOutputPath, "out", "o", "", "path to output")
 	dataModelShowTablesCmd.Flags().StringVarP(&dataModelsModelType, "type", "t", "", "model type")
 	_ = dataModelShowTablesCmd.MarkFlagRequired("out")
+
+	dataModelsListCmd.AddCommand(dataModelShowTableColumnsCmd)
+	dataModelShowTableColumnsCmd.Flags().StringVarP(&dataModelsOutputPath, "out", "o", "", "path to output")
+	dataModelShowTableColumnsCmd.Flags().StringVarP(&dataModelsModelType, "type", "t", "", "table type")
+	dataModelShowTableColumnsCmd.Flags().StringVarP(&dataModelsTableCode, "table-code", "c", "", "table code")
+	_ = dataModelShowTableColumnsCmd.MarkFlagRequired("out")
+	// _ = dataModelShowTableColumnsCmd.MarkFlagRequired("type")
+	_ = dataModelShowTableColumnsCmd.MarkFlagRequired("table-code")
 }
