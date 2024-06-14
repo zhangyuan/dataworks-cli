@@ -143,3 +143,12 @@ func ListDataModelColumns() ([]dataworks.RawDataModelColumn, error) {
 
 	return client.ListDataModelColumns()
 }
+
+func ShowTables(modelType string) (interface{}, error) {
+	client, err := CreateClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return client.DataModelShowTables(modelType)
+}

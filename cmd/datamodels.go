@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listDataModelColumnsCmd = &cobra.Command{
+var listDataMoelColumnsCmd = &cobra.Command{
 	Use:   "list-columns",
 	Short: "List data model coloumns",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -22,7 +22,22 @@ var listDataModelColumnsCmd = &cobra.Command{
 	},
 }
 
-var listDataModelsCmd = &cobra.Command{
+var dataModelShowTablesCmd = &cobra.Command{
+	Use:   "show-tables",
+	Short: "Show tables",
+	Run: func(cmd *cobra.Command, args []string) {
+		models, err := services.ShowTables(dataModelsModelType)
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
+
+		if err := WriteJSON(dataModelsOutputPath, models); err != nil {
+			log.Fatalln(err)
+		}
+	},
+}
+
+var dataModelListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List data models",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -37,20 +52,26 @@ var listDataModelsCmd = &cobra.Command{
 	},
 }
 
-var dataModelsCmd = &cobra.Command{
+var dataModelsListCmd = &cobra.Command{
 	Use: "data-models",
 }
 
 var dataModelsOutputPath string
+var dataModelsModelType string
 
 func init() {
-	rootCmd.AddCommand(dataModelsCmd)
-	dataModelsCmd.AddCommand(listDataModelColumnsCmd)
-	dataModelsCmd.AddCommand(listDataModelsCmd)
+	rootCmd.AddCommand(dataModelsListCmd)
+	dataModelsListCmd.AddCommand(listDataMoelColumnsCmd)
 
-	listDataModelColumnsCmd.Flags().StringVarP(&dataModelsOutputPath, "out", "o", "", "path to output")
-	_ = listDataModelColumnsCmd.MarkFlagRequired("out")
+	listDataMoelColumnsCmd.Flags().StringVarP(&dataModelsOutputPath, "out", "o", "", "path to output")
+	_ = listDataMoelColumnsCmd.MarkFlagRequired("out")
 
-	listDataModelsCmd.Flags().StringVarP(&dataModelsOutputPath, "out", "o", "", "path to output")
-	_ = listDataModelsCmd.MarkFlagRequired("out")
+	dataModelsListCmd.AddCommand(dataModelListCmd)
+	dataModelListCmd.Flags().StringVarP(&dataModelsOutputPath, "out", "o", "", "path to output")
+	_ = dataModelListCmd.MarkFlagRequired("out")
+
+	dataModelsListCmd.AddCommand(dataModelShowTablesCmd)
+	dataModelShowTablesCmd.Flags().StringVarP(&dataModelsOutputPath, "out", "o", "", "path to output")
+	dataModelShowTablesCmd.Flags().StringVarP(&dataModelsModelType, "type", "t", "", "model type")
+	_ = dataModelShowTablesCmd.MarkFlagRequired("out")
 }

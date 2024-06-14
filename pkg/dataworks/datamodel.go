@@ -34,8 +34,14 @@ type DataModelColumn struct {
 	ColumnTye      string
 }
 
-func (client *Client) ListDataModelColumns() ([]RawDataModelColumn, error) {
-	query := "show full tables"
+func (client *Client) DataModelShowTables(modelType string) (interface{}, error) {
+	var query string
+	if modelType == "" {
+		query = "show tables"
+	} else {
+		query = fmt.Sprintf("show %s tables", modelType)
+	}
+
 	projectId := fmt.Sprintf("%d", client.ProjectId)
 	request := dataworks_public20200518.QueryPublicModelEngineRequest{
 		ProjectId: &projectId,
@@ -46,9 +52,18 @@ func (client *Client) ListDataModelColumns() ([]RawDataModelColumn, error) {
 		return nil, err
 	}
 
+	return res.Body.ReturnValue, nil
+}
+
+func (client *Client) ListDataModelColumns() ([]RawDataModelColumn, error) {
+	returnValue, err := client.DataModelShowTables("full")
+	if err != nil {
+		return nil, err
+	}
+
 	var columns []RawDataModelColumn
 
-	if err := mapstructure.Decode(res.Body.ReturnValue, &columns); err != nil {
+	if err := mapstructure.Decode(returnValue, &columns); err != nil {
 		return nil, err
 	}
 
