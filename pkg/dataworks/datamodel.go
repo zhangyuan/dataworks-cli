@@ -2,6 +2,8 @@ package dataworks
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 
 	dataworks_public20200518 "github.com/alibabacloud-go/dataworks-public-20200518/v6/client"
 	"github.com/mitchellh/mapstructure"
@@ -79,18 +81,37 @@ func (client *Client) DataModelShowTableColumns(modelType string, tableCode stri
 }
 
 func (client *Client) ListDataModelColumns() ([]RawDataModelColumn, error) {
-	returnValue, err := client.DataModelQuery("full")
-	if err != nil {
-		return nil, err
+	offset := 0
+	limit := 1000
+
+	var allColumns []RawDataModelColumn
+
+	for {
+		query := fmt.Sprintf("show full tables offset %d limit %d", offset, limit)
+		returnValue, err := client.DataModelQuery(query)
+		if err != nil {
+			return nil, err
+		}
+		var columns []RawDataModelColumn
+		if err := mapstructure.Decode(returnValue, &columns); err != nil {
+			return nil, err
+		}
+
+		allColumns = append(allColumns, columns...)
+
+		if len(columns) < limit {
+			break
+		}
+
+		offset += limit
+
+		client.Wait()
 	}
 
-	var columns []RawDataModelColumn
-
-	if err := mapstructure.Decode(returnValue, &columns); err != nil {
-		return nil, err
-	}
-
-	return columns, nil
+	sort.Slice(allColumns, func(i, j int) bool {
+		return strings.Compare(fmt.Sprintf("%s", allColumns[i].TableCode), allColumns[i].TableCode) > 0
+	})
+	return allColumns, nil
 }
 
 func (client *Client) ListDataModels() ([]DataModel, error) {
