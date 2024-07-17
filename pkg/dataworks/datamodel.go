@@ -109,7 +109,7 @@ func (client *Client) ListDataModelColumns() ([]RawDataModelColumn, error) {
 	}
 
 	sort.Slice(allColumns, func(i, j int) bool {
-		return strings.Compare(fmt.Sprintf("%s", allColumns[i].TableCode), allColumns[i].TableCode) > 0
+		return strings.Compare(allColumns[i].TableCode, allColumns[i].TableCode) > 0
 	})
 	return allColumns, nil
 }
