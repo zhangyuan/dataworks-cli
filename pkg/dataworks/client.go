@@ -151,6 +151,11 @@ func (client *Client) GetFolders(projectId int64, folderIds []string) ([]Folder,
 			return nil, err
 		}
 
+		// somehow the server returns folder with path `queryroot` and folder id is null
+		if response.Body.Data.FolderId == nil {
+			continue
+		}
+
 		folders = append(folders, Folder{
 			FolderId:   *response.Body.Data.FolderId,
 			FolderPath: *response.Body.Data.FolderPath,
